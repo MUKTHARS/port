@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Admin</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Dark mode styling for admin */
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #242424;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --accent-color: #00adb5;
+            --danger-color: #ff4444;
+            --success-color: #00C851;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar styling */
+        .sidebar {
+            width: 250px;
+            background: var(--bg-secondary);
+            padding: 2rem 1rem;
+            position: fixed;
+            height: 100vh;
+        }
+
+        .sidebar-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-menu a {
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: var(--accent-color);
+        }
+
+        .sidebar-menu i {
+            margin-right: 0.75rem;
+            width: 20px;
+        }
+
+        /* Main content styling */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 2rem;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .content-header h1 {
+            font-size: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Form styling */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Table styling */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #444;
+        }
+
+        th {
+            background: var(--bg-secondary);
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: rgba(0, 173, 181, 0.1);
+        }
+
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Section tabs */
+        .section-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-tab {
+            padding: 0.75rem 1.5rem;
+            background: var(--bg-secondary);
+            border: none;
+            border-radius: 5px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .section-tab.active {
+            background: var(--accent-color);
+        }
+
+        .section-content {
+            display: none;
+        }
+
+        .section-content.active {
+            display: block;
+        }
+
+        /* Message status */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.875rem;
+        }
+
+        .status-new {
+            background: var(--accent-color);
+        }
+
+        .status-read {
+            background: var(--success-color);
+        }
+
+        .status-replied {
+            background: #666;
+        }
+
+        /* Image preview */
+        .image-preview {
+            max-width: 200px;
+            margin-top: 1rem;
+            border-radius: 5px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                padding: 1rem 0.5rem;
+            }
+
+            .sidebar-header h2 {
+                display: none;
+            }
+
+            .sidebar-menu span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 70px;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Admin Panel</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#" data-section="profile" class="active"><i class="fas fa-user"></i>
+                        <span>Profile</span></a></li>
+                <li><a href="#" data-section="education"><i class="fas fa-graduation-cap"></i>
+                        <span>Education</span></a></li>
+                <li><a href="#" data-section="skills"><i class="fas fa-cogs"></i> <span>Skills</span></a></li>
+                <li><a href="#" data-section="projects"><i class="fas fa-project-diagram"></i> <span>Projects</span></a>
+                </li>
+                <li><a href="#" data-section="experience"><i class="fas fa-briefcase"></i> <span>Experience</span></a>
+                </li>
+                <li><a href="#" data-section="internships"><i class="fas fa-user-tie"></i> <span>Internships</span></a>
+                </li>
+                <li><a href="#" data-section="messages"><i class="fas fa-envelope"></i> <span>Messages</span></a></li>
+                <li><a href="#" id="logout"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Profile Section -->
+            <section id="profile" class="section-content active">
+                <div class="content-header">
+                    <h1>Profile Information</h1>
+                    <button class="btn btn-primary" id="saveProfile">Save Changes</button>
+                </div>
+                <form id="profileForm">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="title">Professional Title</label>
+                        <input type="text" id="title" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="profileImage">Profile Image URL</label>
+                        <input type="text" id="profileImage" name="profile_image">
+                        <img id="profileImagePreview" class="image-preview" style="display:none;">
+                    </div>
+                    <div class="form-group">
+                        <label for="aboutText">About Me</label>
+                        <textarea id="aboutText" name="about_text" rows="5"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="contactEmail">Contact Email</label>
+                        <input type="email" id="contactEmail" name="contact_email">
+                    </div>
+                    <div class="form-group">
+                        <label for="contactPhone">Contact Phone</label>
+                        <input type="tel" id="contactPhone" name="contact_phone">
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" name="location">
+                    </div>
+                    <div class="form-group">
+                        <label for="linkedinUrl">LinkedIn URL</label>
+                        <input type="url" id="linkedinUrl" name="linkedin_url">
+                    </div>
+                    <div class="form-group">
+                        <label for="githubUrl">GitHub URL</label>
+                        <input type="url" id="githubUrl" name="github_url">
+                    </div>
+                    <div class="form-group">
+                        <label for="twitterUrl">Twitter URL</label>
+                        <input type="url" id="twitterUrl" name="twitter_url">
+                    </div>
+                </form>
+            </section>
+
+            <!-- Education Section -->
+            <section id="education" class="section-content">
+                <div class="content-header">
+                    <h1>Education</h1>
+                    <button class="btn btn-primary" id="addEducation">Add Education</button>
+                </div>
+                <div class="table-container">
+                    <table id="educationTable">
+                        <thead>
+                            <tr>
+                                <th>Institution</th>
+                                <th>Degree</th>
+                                <th>Field</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Grade</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Skills Section -->
+            <section id="skills" class="section-content">
+                <div class="content-header">
+                    <h1>Skills</h1>
+                    <button class="btn btn-primary" id="addSkill">Add Skill</button>
+                </div>
+                <div class="table-container">
+                    <table id="skillsTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Level</th>
+                                <th>Icon</th>
+                                <th>Category</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Projects Section -->
+            <section id="projects" class="section-content">
+                <div class="content-header">
+                    <h1>Projects</h1>
+                    <button class="btn btn-primary" id="addProject">Add Project</button>
+                </div>
+                <div class="table-container">
+                    <table id="projectsTable">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Image</th>
+                                <th>Technologies</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Experience Section -->
+            <section id="experience" class="section-content">
+                <div class="content-header">
+                    <h1>Work Experience</h1>
+                    <button class="btn btn-primary" id="addExperience">Add Experience</button>
+                </div>
+                <div class="section-tabs">
+                    <button class="section-tab active" data-tab="fulltime">Full Time</button>
+                    <button class="section-tab" data-tab="parttime">Part Time</button>
+                </div>
+                <div class="table-container" id="fulltimeTable">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Position</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-container" id="parttimeTable" style="display:none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Position</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Internships Section -->
+            <section id="internships" class="section-content">
+                <div class="content-header">
+                    <h1>Internships</h1>
+                    <button class="btn btn-primary" id="addInternship">Add Internship</button>
+                </div>
+                <div class="table-container">
+                    <table id="internshipsTable">
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Position</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Messages Section -->
+            <section id="messages" class="section-content">
+                <div class="content-header">
+                    <h1>Contact Messages</h1>
+                </div>
+                <div class="table-container">
+                    <table id="messagesTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Message</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal for adding/editing items -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2 id="modalTitle">Add Item</h2>
+            <form id="modalForm">
+                <!-- Form fields will be inserted dynamically -->
+            </form>
+            <div style="margin-top: 2rem; text-align: right;">
+                <button type="button" class="btn btn-danger" id="modalCancel">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="modalSave">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentSection = 'profile';
+        let currentEditId = null;
+        let currentFormType = null;
+
+        // Initialize admin panel
+        document.addEventListener('DOMContentLoaded', () => {
+            // checkAuth();
+            initializeNavigation();
+            loadProfileData();
+            initializeEventListeners();
+        });
+
+        // Check authentication
+        function checkAuth() {
+            // In a real implementation, check for auth token
+            const isAuthenticated = localStorage.getItem('adminToken');
+            if (!isAuthenticated) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Initialize navigation
+        function initializeNavigation() {
+            const menuItems = document.querySelectorAll('.sidebar-menu a:not(#logout)');
+            menuItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = item.dataset.section;
+                    switchSection(section);
+                });
+            });
+
+            document.getElementById('logout').addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('adminToken');
+                window.location.href = 'login.html';
+            });
+        }
+
+        // Switch between sections
+        function switchSection(section) {
+            currentSection = section;
+
+            // Update navigation
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.section === section) {
+                    link.classList.add('active');
+                }
+            });
+
+            // Update content
+            document.querySelectorAll('.section-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(section).classList.add('active');
+
+            // Load section data
+            switch (section) {
+                case 'education':
+                    loadEducationData();
+                    break;
+                case 'skills':
+                    loadSkillsData();
+                    break;
+                case 'projects':
+                    loadProjectsData();
+                    break;
+                case 'experience':
+                    loadExperienceData();
+                    break;
+                case 'internships':
+                    loadInternshipsData();
+                    break;
+                case 'messages':
+                    loadMessagesData();
+                    break;
+            }
+        }
+
+        // Initialize event listeners
+        function initializeEventListeners() {
+            // Profile form
+            document.getElementById('saveProfile').addEventListener('click', saveProfile);
+            document.getElementById('profileImage').addEventListener('input', updateImagePreview);
+
+            // Add buttons
+            document.getElementById('addEducation').addEventListener('click', () => showModal('education'));
+            document.getElementById('addSkill').addEventListener('click', () => showModal('skill'));
+            document.getElementById('addProject').addEventListener('click', () => showModal('project'));
+            document.getElementById('addExperience').addEventListener('click', () => showModal('experience'));
+            document.getElementById('addInternship').addEventListener('click', () => showModal('internship'));
+
+            // Modal controls
+            document.querySelector('.modal-close').addEventListener('click', closeModal);
+            document.getElementById('modalCancel').addEventListener('click', closeModal);
+            document.getElementById('modalForm').addEventListener('submit', saveModalForm);
+
+            // Experience tabs
+            document.querySelectorAll('.section-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    const tabName = tab.dataset.tab;
+                    document.getElementById('fulltimeTable').style.display = tabName === 'fulltime' ? 'block' : 'none';
+                    document.getElementById('parttimeTable').style.display = tabName === 'parttime' ? 'block' : 'none';
+                });
+            });
+        }
+
+        // Load profile data
+        async function loadProfileData() {
+            try {
+                const response = await fetch('/api/admin/profile');
+                const data = await response.json();
+
+                document.getElementById('name').value = data.name || '';
+                document.getElementById('title').value = data.title || '';
+                document.getElementById('profileImage').value = data.profile_image || '';
+                document.getElementById('aboutText').value = data.about_text || '';
+                document.getElementById('contactEmail').value = data.contact_email || '';
+                document.getElementById('contactPhone').value = data.contact_phone || '';
+                document.getElementById('location').value = data.location || '';
+                document.getElementById('linkedinUrl').value = data.linkedin_url || '';
+                document.getElementById('githubUrl').value = data.github_url || '';
+                document.getElementById('twitterUrl').value = data.twitter_url || '';
+
+                updateImagePreview();
+            } catch (error) {
+                console.error('Error loading profile data:', error);
+            }
+        }
+
+        // Load education data
+        async function loadEducationData() {
+            try {
+                const response = await fetch('/api/admin/education');
+                const data = await response.json();
+
+                const tbody = document.querySelector('#educationTable tbody');
+                tbody.innerHTML = '';
+
+                data.forEach(item => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${item.institution}</td>
+                            <td>${item.degree}</td>
+                            <td>${item.field || '-'}</td>
+                            <td>${item.start_date}</td>
+                            <td>${item.end_date || 'Present'}</td>
+                            <td>${item.grade || '-'}</td>
+                            <td>
+                                <button class="btn btn-primary" onclick="editItem('education', ${item.id})">Edit</button>
+                                <button class="btn btn-danger" onclick="deleteItem('education', ${item.id})">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error loading education data:', error);
+            }
+        }
+
+        // Load skills data
+        async function loadSkillsData() {
+            try {
+                const response = await fetch('/api/admin/skills');
+                const data = await response.json();
+
+                const tbody = document.querySelector('#skillsTable tbody');
+                tbody.innerHTML = '';
+
+                data.forEach(item => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${item.name}</td>
+                            <td>${item.level}</td>
+                            <td>${item.icon}</td>
+                            <td>${item.category || '-'}</td>
+                            <td>
+                                <button class="btn btn-primary" onclick="editItem('skill', ${item.id})">Edit</button>
+                                <button class="btn btn-danger" onclick="deleteItem('skill', ${item.id})">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error loading skills data:', error);
+            }
+        }
+
+        // Load projects data
+        async function loadProjectsData() {
+            try {
+                const response = await fetch('/api/admin/projects');
+                const data = await response.json();
+
+                const tbody = document.querySelector('#projectsTable tbody');
+                tbody.innerHTML = '';
+
+                data.forEach(item => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${item.title}</td>
+                            <td>${item.description ? item.description.substring(0, 50) + '...' : '-'}</td>
+                            <td>${item.image_url ? `<img src="${item.image_url}" width="50">` : '-'}</td>
+                            <td>${item.technologies || '-'}</td>
+                            <td>
+                                <button class="btn btn-primary" onclick="editItem('project', ${item.id})">Edit</button>
+                                <button class="btn btn-danger" onclick="deleteItem('project', ${item.id})">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error loading projects data:', error);
+            }
+        }
+
+        // Load experience data
+        async function loadExperienceData() {
+            try {
+                const response = await fetch('/api/admin/experience');
+                const data = await response.json();
+
+                // Fill fulltime table
+                const fulltimeBody = document.querySelector('#fulltimeTable tbody');
+                fulltimeBody.innerHTML = '';
+
+                data.fulltime.forEach(item => {
+                    fulltimeBody.innerHTML += `
+                        <tr>
+                            <td>${item.company}</td>
+                            <td>${item.position}</td>
+                            <td>${item.start_date}</td>
+                            <td>${item.end_date || 'Present'}</td>
+                            <td>
+                                <button class="btn btn-primary" onclick="editItem('experience', ${item.id})">Edit</button>
+                                <button class="btn btn-danger" onclick="deleteItem('experience', ${item.id})">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                // Fill parttime table
+                const parttimeBody = document.querySelector('#parttimeTable tbody');
+                parttimeBody.innerHTML = '';
+
+                data.parttime.forEach(item => {
+                    parttimeBody.innerHTML += `
+                        <tr>
+                            <td>${item.company}</td>
+                            <td>${item.position}</td>
+                            <td>${item.start_date}</td>
+                            <td>${item.end_date || 'Present'}</td>
+                            <td>
+                                <button class="btn btn-primary" onclick="editItem('experience', ${item.id})">Edit</button>
+                                <button class="btn btn-danger" onclick="deleteItem('experience', ${item.id})">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error loading experience data:', error);
+            }
+        }
+
+        // Load internships data
+        async function loadInternshipsData() {
+            try {
+                const response = await fetch('/api/admin/internships');
+                const data = await response.json();
+
+                const tbody = document.querySelector('#internshipsTable tbody');
+                tbody.innerHTML = '';
+
+                data.forEach(item => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${item.company}</td>
+                            <td>${item.position}</td>
+                            <td>${item.start_date}</td>
+                            <td>${item.end_date || 'Present'}</td>
+                            <td>
+                                <button class="btn btn-primary" onclick="editItem('internship', ${item.id})">Edit</button>
+                                <button class="btn btn-danger" onclick="deleteItem('internship', ${item.id})">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error loading internships data:', error);
+            }
+        }
+
+        // Load messages data
+        async function loadMessagesData() {
+            try {
+                const response = await fetch('/api/admin/messages');
+                const data = await response.json();
+
+                const tbody = document.querySelector('#messagesTable tbody');
+                tbody.innerHTML = '';
+
+                data.forEach(item => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${new Date(item.created_at).toLocaleDateString()}</td>
+                            <td>${item.name}</td>
+                            <td>${item.email}</td>
+                            <td>${item.message.substring(0, 50)}...</td>
+                            <td><span class="status-badge status-${item.status}">${item.status}</span></td>
+                            <td>
+                                <button class="btn btn-primary" onclick="viewMessage(${item.id})">View</button>
+                                <button class="btn btn-success" onclick="updateMessageStatus(${item.id}, 'replied')">Mark Replied</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error loading messages data:', error);
+            }
+        }
+
+        // Save profile
+        async function saveProfile() {
+            const formData = new FormData(document.getElementById('profileForm'));
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/api/admin/profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('Profile updated successfully!');
+                } else {
+                    throw new Error('Failed to update profile');
+                }
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                alert('Error updating profile. Please try again.');
+            }
+        }
+
+        // Update image preview
+        function updateImagePreview() {
+            const url = document.getElementById('profileImage').value;
+            const preview = document.getElementById('profileImagePreview');
+
+            if (url) {
+                preview.src = url;
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        // Show modal for adding/editing
+        function showModal(type, id = null) {
+            currentFormType = type;
+            currentEditId = id;
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalForm = document.getElementById('modalForm');
+
+            modalTitle.textContent = id ? `Edit ${type}` : `Add ${type}`;
+            modalForm.innerHTML = getFormFields(type);
+
+            if (id) {
+                loadFormData(type, id);
+            }
+
+            modal.style.display = 'block';
+        }
+
+        // Get form fields based on type
+        function getFormFields(type) {
+            switch (type) {
+                case 'education':
+                    return `
+                        <div class="form-group">
+                            <label for="institution">Institution</label>
+                            <input type="text" id="institution" name="institution" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="degree">Degree</label>
+                            <input type="text" id="degree" name="degree" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="field">Field of Study</label>
+                            <input type="text" id="field" name="field">
+                        </div>
+                        <div class="form-group">
+                            <label for="start_date">Start Date</label>
+                            <input type="date" id="start_date" name="start_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="end_date">End Date</label>
+                            <input type="date" id="end_date" name="end_date">
+                        </div>
+                        <div class="form-group">
+                            <label for="grade">Grade/Percentage</label>
+                            <input type="text" id="grade" name="grade">
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" name="description"></textarea>
+                        </div>
+                    `;
+                case 'skill':
+                    return `
+                        <div class="form-group">
+                            <label for="name">Skill Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="level">Level</label>
+                            <select id="level" name="level" required>
+                                <option value="Beginner">Beginner</option>
+                                <option value="Intermediate">Intermediate</option>
+                                <option value="Advanced">Advanced</option>
+                                <option value="Expert">Expert</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="icon">Icon (Font Awesome class)</label>
+                            <input type="text" id="icon" name="icon" placeholder="e.g., fab fa-javascript">
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <input type="text" id="category" name="category">
+                        </div>
+                    `;
+                case 'project':
+                    return `
+                        <div class="form-group">
+                            <label for="title">Project Title</label>
+                            <input type="text" id="title" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" name="description" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="image_url">Image URL</label>
+                            <input type="text" id="image_url" name="image_url">
+                        </div>
+                        <div class="form-group">
+                            <label for="video_url">Video URL</label>
+                            <input type="text" id="video_url" name="video_url">
+                        </div>
+                        <div class="form-group">
+                            <label for="github_url">GitHub URL</label>
+                            <input type="url" id="github_url" name="github_url">
+                        </div>
+                        <div class="form-group">
+                            <label for="live_url">Live URL</label>
+                            <input type="url" id="live_url" name="live_url">
+                        </div>
+                        <div class="form-group">
+                            <label for="technologies">Technologies (comma-separated)</label>
+                            <input type="text" id="technologies" name="technologies">
+                        </div>
+                    `;
+                case 'experience':
+                    return `
+                        <div class="form-group">
+                            <label for="company">Company</label>
+                            <input type="text" id="company" name="company" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="position">Position</label>
+                            <input type="text" id="position" name="position" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="type">Type</label>
+                            <select id="type" name="type" required>
+                                <option value="fulltime">Full Time</option>
+                                <option value="parttime">Part Time</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="start_date">Start Date</label>
+                            <input type="date" id="start_date" name="start_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="end_date">End Date</label>
+                            <input type="date" id="end_date" name="end_date">
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" name="description"></textarea>
+                        </div>
+                    `;
+                case 'internship':
+                    return `
+                        <div class="form-group">
+                            <label for="company">Company</label>
+                            <input type="text" id="company" name="company" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="position">Position</label>
+                            <input type="text" id="position" name="position" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="start_date">Start Date</label>
+                            <input type="date" id="start_date" name="start_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="end_date">End Date</label>
+                            <input type="date" id="end_date" name="end_date">
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" name="description"></textarea>
+                        </div>
+                    `;
+            }
+        }
+
+        // Load form data for editing
+        async function loadFormData(type, id) {
+            try {
+                const response = await fetch(`/api/admin/${type}/${id}`);
+                const data = await response.json();
+
+                Object.keys(data).forEach(key => {
+                    const input = document.getElementById(key);
+                    if (input) {
+                        input.value = data[key];
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading form data:', error);
+            }
+        }
+
+        // Save modal form
+        async function saveModalForm(e) {
+            e.preventDefault();
+
+            const formData = new FormData(document.getElementById('modalForm'));
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const url = currentEditId
+                    ? `/api/admin/${currentFormType}/${currentEditId}`
+                    : `/api/admin/${currentFormType}`;
+
+                const method = currentEditId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    closeModal();
+                    alert(`${currentFormType} saved successfully!`);
+
+                    // Reload the appropriate section
+                    switch (currentFormType) {
+                        case 'education':
+                            loadEducationData();
+                            break;
+                        case 'skill':
+                            loadSkillsData();
+                            break;
+                        case 'project':
+                            loadProjectsData();
+                            break;
+                        case 'experience':
+                            loadExperienceData();
+                            break;
+                        case 'internship':
+                            loadInternshipsData();
+                            break;
+                    }
+                } else {
+                    throw new Error('Failed to save data');
+                }
+            } catch (error) {
+                console.error('Error saving data:', error);
+                alert('Error saving data. Please try again.');
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.style.display = 'none';
+            document.getElementById('modalForm').reset();
+            currentEditId = null;
+            currentFormType = null;
+        }
+
+        // Edit item
+        window.editItem = function (type, id) {
+            showModal(type, id);
+        }
+
+        // Delete item
+        window.deleteItem = async function (type, id) {
+            if (!confirm('Are you sure you want to delete this item?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/${type}/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('Item deleted successfully!');
+
+                    // Reload the appropriate section
+                    switch (type) {
+                        case 'education':
+                            loadEducationData();
+                            break;
+                        case 'skill':
+                            loadSkillsData();
+                            break;
+                        case 'project':
+                            loadProjectsData();
+                            break;
+                        case 'experience':
+                            loadExperienceData();
+                            break;
+                        case 'internship':
+                            loadInternshipsData();
+                            break;
+                    }
+                } else {
+                    throw new Error('Failed to delete item');
+                }
+            } catch (error) {
+                console.error('Error deleting item:', error);
+                alert('Error deleting item. Please try again.');
+            }
+        }
+
+        // View message
+        window.viewMessage = async function (id) {
+            try {
+                const response = await fetch(`/api/admin/messages/${id}`);
+                const message = await response.json();
+
+                alert(`
+From: ${message.name} (${message.email})
+Date: ${new Date(message.created_at).toLocaleString()}
+Status: ${message.status}
+
+Message:
+${message.message}
+                `);
+
+                // Mark as read if new
+                if (message.status === 'new') {
+                    await updateMessageStatus(id, 'read');
+                }
+            } catch (error) {
+                console.error('Error viewing message:', error);
+            }
+        }
+
+        // Update message status
+        window.updateMessageStatus = async function (id, status) {
+            try {
+                const response = await fetch(`/api/admin/messages/${id}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status })
+                });
+
+                if (response.ok) {
+                    loadMessagesData();
+                } else {
+                    throw new Error('Failed to update message status');
+                }
+            } catch (error) {
+                console.error('Error updating message status:', error);
+            }
+        }
+    </script>
+</body>
+
+</html>
