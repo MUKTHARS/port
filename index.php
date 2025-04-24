@@ -545,25 +545,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-<!-- 
-   <script>passiona
-    // Go to Top Button
-const goToTopButton = document.createElement('a');
-goToTopButton.href = '#home';
-goToTopButton.className = 'go-to-top';
-goToTopButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
-document.body.appendChild(goToTopButton);
 
-window.addEventListener('scroll', function() {
-    if (window.innerWidth <= 768) {
-        if (window.pageYOffset > 300) {
-            goToTopButton.classList.add('visible');
-        } else {
-            goToTopButton.classList.remove('visible');
-        }
-    }
-});
-   </script>  -->
    <script src="script.js"></script>
 </body>
 </html>
